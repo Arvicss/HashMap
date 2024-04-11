@@ -13,7 +13,6 @@ public class DepartmentDA {
     public DepartmentDA() throws FileNotFoundException {
         Scanner deptFile = new Scanner(new FileReader("data/dep.csv"));
 
-
         // Skips first line or header
         if (deptFile.hasNextLine()) {
             deptFile.nextLine();
@@ -26,35 +25,38 @@ public class DepartmentDA {
             Department department = new Department();
             department.setDeptCode(deptDataArray[0].trim());
             department.setDeptName(deptDataArray[1].trim());
-
-            HashMap<String, Employee> deptEmpMap = new HashMap<>();
-
-            Scanner deptEmpFile = new Scanner(new FileReader("data/deptemp.csv"));
-
-            // Skips first line or header
-            if (deptEmpFile.hasNextLine()) {
-                deptEmpFile.nextLine();
-            }
-
-            while(deptEmpFile.hasNextLine()) {
-                String deptEmpRaw = deptEmpFile.nextLine();
-                String[] deptEmpDataArray = deptEmpRaw.split(",", 3);
-
-                if (!deptEmpDataArray[0].equals(deptDataArray[0])) continue;
-
-                EmployeeDA employeeDA = new EmployeeDA(deptEmpDataArray[1].trim());
-                Employee employee = employeeDA.getEmployee();
-                employee.setSalary(Double.parseDouble(deptEmpDataArray[2].trim()));
-
-                deptEmpMap.put(deptEmpDataArray[1].trim(), employee);
-                department.setDepTotalSalary(department.getDepTotalSalary() + employee.getSalary());
-            }
-
-            department.setEmployeeMap(deptEmpMap);
+            department.setEmployeeMap(readDepEmp(department));
             printDepartment(department);
         }
 
         deptFile.close();
+    }
+
+    public HashMap<String, Employee> readDepEmp(Department department) throws FileNotFoundException {
+        HashMap<String, Employee> deptEmpMap = new HashMap<>();
+
+        Scanner deptEmpFile = new Scanner(new FileReader("data/deptemp.csv"));
+
+        // Skips first line or header
+        if (deptEmpFile.hasNextLine()) {
+            deptEmpFile.nextLine();
+        }
+
+        while(deptEmpFile.hasNextLine()) {
+            String deptEmpRaw = deptEmpFile.nextLine();
+            String[] deptEmpDataArray = deptEmpRaw.split(",", 3);
+
+            if (!deptEmpDataArray[0].equals(department.getDeptCode())) continue;
+
+            EmployeeDA employeeDA = new EmployeeDA(deptEmpDataArray[1].trim());
+            Employee employee = employeeDA.getEmployee();
+            employee.setSalary(Double.parseDouble(deptEmpDataArray[2].trim()));
+
+            deptEmpMap.put(deptEmpDataArray[1].trim(), employee);
+            department.setDepTotalSalary(department.getDepTotalSalary() + employee.getSalary());
+        }
+
+        return deptEmpMap;
     }
 
     private void printDepartment(Department department) {
