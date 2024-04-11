@@ -25,7 +25,14 @@ public class DepartmentDA {
             Department department = new Department();
             department.setDeptCode(deptDataArray[0].trim());
             department.setDeptName(deptDataArray[1].trim());
-            department.setEmployeeMap(readDepEmp(department));
+
+            HashMap<String, Employee> employeeMap = readDepEmp(department);
+            department.setEmployeeMap(employeeMap);
+
+            for(HashMap.Entry<String, Employee> entry : employeeMap.entrySet()) {
+                department.setDepTotalSalary(department.getDepTotalSalary() + entry.getValue().getSalary());
+            }
+
             printDepartment(department);
         }
 
@@ -53,7 +60,6 @@ public class DepartmentDA {
             employee.setSalary(Double.parseDouble(deptEmpDataArray[2].trim()));
 
             deptEmpMap.put(deptEmpDataArray[1].trim(), employee);
-            department.setDepTotalSalary(department.getDepTotalSalary() + employee.getSalary());
         }
 
         return deptEmpMap;
