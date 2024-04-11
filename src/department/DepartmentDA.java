@@ -12,7 +12,7 @@ import java.util.Scanner;
 public class DepartmentDA {
     public DepartmentDA() throws FileNotFoundException {
         Scanner deptFile = new Scanner(new FileReader("data/dep.csv"));
-        DecimalFormat decimalFormat = new DecimalFormat("##,###.00");
+
 
         // Skips first line or header
         if (deptFile.hasNextLine()) {
@@ -27,7 +27,7 @@ public class DepartmentDA {
             department.setDeptCode(deptDataArray[0].trim());
             department.setDeptName(deptDataArray[1].trim());
 
-            HashMap<String, Employee> deptEmpList = new HashMap<>();
+            HashMap<String, Employee> deptEmpMap = new HashMap<>();
 
             Scanner deptEmpFile = new Scanner(new FileReader("data/deptemp.csv"));
 
@@ -46,26 +46,33 @@ public class DepartmentDA {
                 Employee employee = employeeDA.getEmployee();
                 employee.setSalary(Double.parseDouble(deptEmpDataArray[2].trim()));
 
-                deptEmpList.put(deptEmpDataArray[1].trim(), employee);
+                deptEmpMap.put(deptEmpDataArray[1].trim(), employee);
                 department.setDepTotalSalary(department.getDepTotalSalary() + employee.getSalary());
             }
 
-            System.out.println("Department code: " + department.getDeptCode());
-            System.out.println("Department name: " + department.getDeptName());
-            System.out.println("Department total salary: " + decimalFormat.format(department.getDepTotalSalary()));
-            System.out.println("--------------------Details--------------------");
-            System.out.printf("%-10s %-25s %-15s", "EmpNo", "Employee Name", "Salary");
-
-            for(HashMap.Entry<String, Employee> entry : deptEmpList.entrySet()) {
-                Employee employee = entry.getValue() ;
-                String employeeName = employee.getLastName() + ", " + employee.getFirstName();
-                String salary = decimalFormat.format(employee.getSalary());
-                System.out.printf("\n%-10s %-25s %-15s", employee.getEmpNo(), employeeName, salary);
-            }
-
-            System.out.println("\n");
+            department.setEmployeeMap(deptEmpMap);
+            printDepartment(department);
         }
 
         deptFile.close();
+    }
+
+    private void printDepartment(Department department) {
+        DecimalFormat decimalFormat = new DecimalFormat("##,###.00");
+
+        System.out.println("Department code: " + department.getDeptCode());
+        System.out.println("Department name: " + department.getDeptName());
+        System.out.println("Department total salary: " + decimalFormat.format(department.getDepTotalSalary()));
+        System.out.println("--------------------Details--------------------");
+        System.out.printf("%-10s %-25s %-15s", "EmpNo", "Employee Name", "Salary");
+
+        for(HashMap.Entry<String, Employee> entry : department.getEmployeeMap().entrySet()) {
+            Employee employee = entry.getValue() ;
+            String employeeName = employee.getLastName() + ", " + employee.getFirstName();
+            String salary = decimalFormat.format(employee.getSalary());
+            System.out.printf("\n%-10s %-25s %-15s", employee.getEmpNo(), employeeName, salary);
+        }
+
+        System.out.println("\n");
     }
 }
